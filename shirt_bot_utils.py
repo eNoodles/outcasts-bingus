@@ -16,12 +16,10 @@ from encoder import encoder
 # ### Bunch of Necessary Stuff ###
 # ################################
 
-with open("config.json") as file:
-    config = json.load(file)
-API_KEY = config["api_key"] or os.getenv("api_key")
-TOKEN = config["token"] or os.getenv("token")
-PREFIX = config["prefix"] or os.getenv("prefix")
-NAME = config["name"] or os.getenv("name")
+API_KEY = os.getenv("api_key")
+TOKEN = os.getenv("token")
+PREFIX = os.getenv("prefix")
+NAME = os.getenv("name")
 
 URL_PATTERN = (
     r"(https?:\/\/(?:www\.|(?!www))"
@@ -122,9 +120,9 @@ class ShirtContext(commands.Context):
 
     async def shirt_send(self, content=None, **kwargs):
         msg = content
-        msg = remove_slurs(msg)
-        if self.channel.id not in uncensored_link_channels:
-            msg = remove_links(msg)
+        # msg = remove_slurs(msg)
+        # if self.channel.id not in uncensored_link_channels:
+        #     msg = remove_links(msg)
         await self.send(msg[:2000], **kwargs)
 
 
@@ -190,7 +188,7 @@ async def collect_messages(channel, *, mode, before=None):
     """Collects messages from a channel for Shirt Bot"""
 
     lst = []
-    async for x in channel.history(limit=50, before=before):
+    async for x in channel.history(limit=100, before=before):
         context = await bot.get_context(x)
         if context.valid and context.command.name == "reset":
             break
@@ -208,7 +206,7 @@ async def collect_messages(channel, *, mode, before=None):
             ):
                 lst.append(f"{author}: {x.content}")
 
-        if len(lst) >= 15:
+        if len(lst) >= 100:
             break
     lst.reverse()
     return lst
